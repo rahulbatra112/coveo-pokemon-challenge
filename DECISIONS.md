@@ -51,3 +51,8 @@
 ## D11 – Detail page on the Search API directly
 - Decision: A plain HTML page that fetches one item by URL from the Search API, shows related Pokémon of the same type, and hands questions off to RGA on the search page.
 - Why: A detail page needs full layout control, which Atomic's components don't give, and plain fetch calls keep it dependency-free. Public settings live in one shared config.js.
+
+## D12 – Passage Retrieval works; content quality is the ceiling
+- Evidence: The PR API returned the right pages (Gecqua first, fresh content a general AI model wouldn't know), but most passages were navigation and move/type tables, and Eevee's evolution text missed the top 5.
+- Decision: Keep content as is for the demo. Next iteration: exclude move, TM, location and sprite tables plus navigation at indexing, then rebuild the models.
+- Why: Answers and passages can only be as good as the chunks behind them. Changing content right before the panel risks the index and models being out of sync.
