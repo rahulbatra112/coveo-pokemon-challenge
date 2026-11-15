@@ -47,3 +47,7 @@
 - Evidence: The QS model showed 0 candidates and "Limited": 1 search and 0 clicks in the org.
 - Decision: Generate the Default Queries file from my own index (every Pokémon name, plus type and question queries) and upload it through the Advanced Model Configurations API, using a temporary private key with one privilege.
 - Why: Every suggestion is guaranteed to return a real result. The script is reusable for any customer facing a cold start.
+
+## D11 – Detail page on the Search API directly
+- Decision: A plain HTML page that fetches one item by URL from the Search API, shows related Pokémon of the same type, and hands questions off to RGA on the search page.
+- Why: A detail page needs full layout control, which Atomic's components don't give, and plain fetch calls keep it dependency-free. Public settings live in one shared config.js.
