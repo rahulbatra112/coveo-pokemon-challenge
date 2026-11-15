@@ -56,3 +56,8 @@
 - Evidence: The PR API returned the right pages (Gecqua first, fresh content a general AI model wouldn't know), but most passages were navigation and move/type tables, and Eevee's evolution text missed the top 5.
 - Decision: Keep content as is for the demo. Next iteration: exclude move, TM, location and sprite tables plus navigation at indexing, then rebuild the models.
 - Why: Answers and passages can only be as good as the chunks behind them. Changing content right before the panel risks the index and models being out of sync.
+
+## D13 – Stop words for question words
+- Evidence: Question-style queries matched hundreds of pages through words like "what," "does" and "into."
+- Decision: Stop word rule on the Pokedex pipeline (what, which, who, how, does, do, did, is, are, was, the, a, an, into, of, as, in, to, for).
+- Result: 857 → 500 results, with the right Pokémon ranked first. Stop words don't affect the query RGA uses, so answers were unchanged.
