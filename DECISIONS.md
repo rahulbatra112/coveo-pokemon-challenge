@@ -37,3 +37,13 @@
 - Evidence: "What does Charmander evolve into?" returned only Bulbasaur, because every word had to match. RGA correctly refused to answer.
 - Decision: Partial match on the Pokedex pipeline (3+ keywords, 50% must match).
 - Why: Generated answers can only use pages that search retrieves first. Short name searches stay strict.
+
+## D9 – Prompt instruction for concise answers
+- Evidence: The Charmander answer was correct but dumped stats, moves and locations.
+- Decision: Custom RGA prompt instruction limiting answers to 1–3 sentences unless the question asks for detail.
+- Why: Answers should match the question. The longer-term fix is cleaner content: excluding move and location tables from what gets indexed.
+
+## D10 – Preload type-ahead from the index itself
+- Evidence: The QS model showed 0 candidates and "Limited": 1 search and 0 clicks in the org.
+- Decision: Generate the Default Queries file from my own index (every Pokémon name, plus type and question queries) and upload it through the Advanced Model Configurations API, using a temporary private key with one privilege.
+- Why: Every suggestion is guaranteed to return a real result. The script is reusable for any customer facing a cold start.
