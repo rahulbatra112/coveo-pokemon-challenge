@@ -1,0 +1,46 @@
+[
+  {
+    "for": {
+      "urls": [
+        ".*"
+      ]
+    },
+    "exclude": [
+      {
+        "type": "CSS",
+        "path": "header, .header, *[role=\"header\"]"
+      },
+      {
+        "type": "CSS",
+        "path": "footer, .footer"
+      },
+      {
+        "type": "CSS",
+        "path": "noscript, nav"
+      }
+    ],
+    "metadata": {
+      "pokemon_name": {
+        "type": "CSS",
+        "path": "main h1::text"
+      },
+      "pokemon_number": {
+        "type": "XPATH",
+        "path": "(//table[contains(@class,'vitals-table')]//strong)[1]/text()"
+      },
+      "pokemon_types": {
+        "type": "CSS",
+        "path": ".sv-tabs-panel.active table.vitals-table a.type-icon::text"
+      },
+      "pokemon_generation": {
+        "type": "XPATH",
+        "path": "(//main//p[contains(.,'introduced in')]//abbr)[1]/text()"
+      },
+      "pokemon_image": {
+        "type": "XPATH",
+        "path": "(//div[contains(@class,'sv-tabs-panel') and contains(@class,'active')]//img[contains(@src,'/artwork/')])[1]/@src"
+      }
+    },
+    "subItems": {}
+  }
+]

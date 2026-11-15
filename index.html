@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light" />
+  <title>Pokédex search</title>
+
+  <!-- Coveo Atomic, pinned to a tested version so the page can't change underneath us -->
+  <script type="module" src="https://static.cloud.coveo.com/atomic/v3.57.3/atomic.esm.js"></script>
+  <link rel="stylesheet" href="https://static.cloud.coveo.com/atomic/v3.57.3/themes/coveo.css" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --dex-red: #c8102e;
+      --dex-red-dark: #9e0b23;
+      --lens-blue: #2f80ed;
+      --ink: #1f2a37;
+      --muted: #5b6573;
+      --paper: #f5f6f8;
+    }
+
+    html { color-scheme: light; }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+
+    /* Brand the Atomic components through their theme variables */
+    atomic-search-interface {
+      --atomic-primary: var(--dex-red);
+      --atomic-primary-light: #e23a50;
+      --atomic-primary-dark: var(--dex-red-dark);
+      --atomic-ring-primary: rgba(200, 16, 46, 0.35);
+      --atomic-font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+
+    /* The red "lid" of a Pokédex, with its blue lens */
+    .lid {
+      background: var(--dex-red);
+      color: #fff;
+      padding: 20px 24px 22px;
+      border-bottom: 6px solid var(--dex-red-dark);
+    }
+
+    .lid-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .lens {
+      flex: none;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 4px solid #fff;
+      background: radial-gradient(circle at 35% 35%, #9fd0ff 0 16%, var(--lens-blue) 46%, #174a94 100%);
+      box-shadow: 0 0 0 2px var(--dex-red-dark);
+    }
+
+    .wordmark {
+      margin: 0;
+      font-family: "Chakra Petch", "IBM Plex Sans", sans-serif;
+      font-weight: 700;
+      font-size: 1.75rem;
+      line-height: 1.1;
+    }
+
+    .tagline {
+      margin: 4px 0 0;
+      font-size: 0.95rem;
+      max-width: 60ch;
+    }
+
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 24px 48px;
+    }
+
+    footer {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px 32px;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    footer a { color: inherit; }
+  </style>
+</head>
+
+<body>
+  <header class="lid">
+    <div class="lid-inner">
+      <span class="lens" aria-hidden="true"></span>
+      <div>
+        <h1 class="wordmark">Pokédex search</h1>
+        <p class="tagline">Every Pokémon from pokemondb.net. Search by name or ask a question, then filter by type and generation.</p>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!--
+      search-hub must match the search hub on the API key ("Pokedex").
+      fields-to-include tells Coveo to return our custom fields with each result.
+    -->
+    <atomic-search-interface
+      search-hub="Pokedex"
+      fields-to-include='["pokemon_name","pokemon_number","pokemon_types","pokemon_generation","pokemon_image"]'>
+
+      <atomic-search-layout>
+        <atomic-layout-section section="search">
+          <atomic-search-box></atomic-search-box>
+        </atomic-layout-section>
+
+        <atomic-layout-section section="facets">
+          <atomic-facet-manager>
+            <atomic-facet field="pokemon_types" label="Type" number-of-values="18" sort-criteria="alphanumeric"></atomic-facet>
+            <atomic-facet field="pokemon_generation" label="Generation" number-of-values="10" sort-criteria="alphanumeric"></atomic-facet>
+          </atomic-facet-manager>
+        </atomic-layout-section>
+
+        <atomic-layout-section section="main">
+          <atomic-layout-section section="status">
+            <atomic-breadbox></atomic-breadbox>
+            <atomic-query-summary></atomic-query-summary>
+            <atomic-refine-toggle></atomic-refine-toggle>
+            <atomic-sort-dropdown>
+              <atomic-sort-expression label="Relevance" expression="relevancy"></atomic-sort-expression>
+              <atomic-sort-expression label="Pokédex number" expression="@pokemon_number ascending"></atomic-sort-expression>
+            </atomic-sort-dropdown>
+            <atomic-did-you-mean></atomic-did-you-mean>
+          </atomic-layout-section>
+
+          <atomic-layout-section section="results">
+            <!-- Shows nothing until the RGA model is active and attached to the pipeline -->
+            <atomic-generated-answer></atomic-generated-answer>
+
+            <atomic-result-list display="grid" image-size="large">
+              <atomic-result-template>
+                <template>
+                  <style>
+                    .meta {
+                      display: flex;
+                      flex-direction: column;
+                      gap: 2px;
+                      font-size: 0.85rem;
+                      color: #5b6573;
+                    }
+                  </style>
+
+                  <atomic-result-section-visual>
+                    <atomic-result-image field="pokemon_image" image-alt-field="pokemon_name"></atomic-result-image>
+                  </atomic-result-section-visual>
+
+                  <atomic-result-section-title>
+                    <!-- Show the clean name instead of the long page title -->
+                    <atomic-result-link>
+                      <atomic-result-text field="pokemon_name"></atomic-result-text>
+                    </atomic-result-link>
+                  </atomic-result-section-title>
+
+                  <atomic-result-section-bottom-metadata>
+                    <div class="meta">
+                      <atomic-result-multi-value-text field="pokemon_types"></atomic-result-multi-value-text>
+                      <atomic-result-text field="pokemon_generation"></atomic-result-text>
+                    </div>
+                  </atomic-result-section-bottom-metadata>
+                </template>
+              </atomic-result-template>
+            </atomic-result-list>
+
+            <atomic-query-error></atomic-query-error>
+            <atomic-no-results></atomic-no-results>
+          </atomic-layout-section>
+
+          <atomic-layout-section section="pagination">
+            <atomic-load-more-results></atomic-load-more-results>
+            <atomic-results-per-page choices-displayed="24,48,96" initial-choice="24"></atomic-results-per-page>
+          </atomic-layout-section>
+        </atomic-layout-section>
+      </atomic-search-layout>
+    </atomic-search-interface>
+  </main>
+
+  <footer>
+    Search powered by Coveo. Pokémon data and artwork from <a href="https://pokemondb.net">pokemondb.net</a>.
+  </footer>
+
+  <script type="module">
+    // Your Coveo organization
+    const COVEO_ORG_ID = "69ydoe1s4lcvoorg";
+
+    // API key created from the "Anonymous search" template, locked to the "Pokedex" search hub.
+    // Safe to expose in browser code: it can only run queries and send usage analytics.
+    const COVEO_API_KEY = "xxd67fea27-1baa-4ff2-8ca1-6da22acea028";
+
+    (async () => {
+      await customElements.whenDefined("atomic-search-interface");
+      const searchInterface = document.querySelector("atomic-search-interface");
+      await searchInterface.initialize({
+        organizationId: COVEO_ORG_ID,
+        accessToken: COVEO_API_KEY,
+      });
+      searchInterface.executeFirstSearch();
+    })();
+  </script>
+</body>
+</html>
