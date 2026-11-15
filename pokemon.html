@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light" />
+  <title>Pokémon details | Pokédex search</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Org ID, public key and search hub, shared with index.html -->
+  <script src="config.js"></script>
+
+  <style>
+    :root {
+      --dex-red: #c8102e;
+      --dex-red-dark: #9e0b23;
+      --lens-blue: #2f80ed;
+      --ink: #1f2a37;
+      --muted: #5b6573;
+      --paper: #f5f6f8;
+      --card: #ffffff;
+      --line: #e1e4e8;
+    }
+
+    html { color-scheme: light; }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+      line-height: 1.5;
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--lens-blue);
+      outline-offset: 2px;
+    }
+
+    /* Same red "lid" as the search page */
+    .lid {
+      background: var(--dex-red);
+      color: #fff;
+      padding: 20px 24px 22px;
+      border-bottom: 6px solid var(--dex-red-dark);
+    }
+
+    .lid-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .lens {
+      flex: none;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 4px solid #fff;
+      background: radial-gradient(circle at 35% 35%, #9fd0ff 0 16%, var(--lens-blue) 46%, #174a94 100%);
+      box-shadow: 0 0 0 2px var(--dex-red-dark);
+    }
+
+    .wordmark {
+      margin: 0;
+      font-family: "Chakra Petch", "IBM Plex Sans", sans-serif;
+      font-weight: 700;
+      font-size: 1.75rem;
+      line-height: 1.1;
+    }
+
+    .wordmark a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px 24px 48px;
+    }
+
+    .back {
+      display: inline-block;
+      margin-bottom: 20px;
+      color: var(--dex-red-dark);
+      font-weight: 500;
+      text-decoration: none;
+    }
+
+    .back:hover { text-decoration: underline; }
+
+    .status {
+      padding: 24px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+
+    .status a { color: var(--dex-red-dark); }
+
+    .pokemon {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 40px;
+      align-items: center;
+    }
+
+    .art {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .art img {
+      width: 100%;
+      max-width: 420px;
+      height: auto;
+    }
+
+    .number {
+      margin: 0;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .name {
+      margin: 4px 0 12px;
+      font-family: "Chakra Petch", "IBM Plex Sans", sans-serif;
+      font-size: clamp(2.25rem, 5vw, 3.25rem);
+      line-height: 1.05;
+    }
+
+    .types {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 0;
+      margin: 0 0 16px;
+    }
+
+    .type {
+      padding: 4px 14px;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .summary {
+      margin: 0 0 28px;
+      font-size: 1.05rem;
+      max-width: 52ch;
+    }
+
+    .ask-heading {
+      margin: 0 0 4px;
+      font-size: 1rem;
+    }
+
+    .ask-hint {
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .questions {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .questions a {
+      display: inline-block;
+      padding: 8px 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--card);
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .questions a:hover {
+      border-color: var(--dex-red);
+      color: var(--dex-red-dark);
+    }
+
+    .source { color: var(--dex-red-dark); }
+
+    .related { margin-top: 56px; }
+
+    .related h2 {
+      margin: 0 0 16px;
+      font-size: 1.25rem;
+    }
+
+    .related-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 16px;
+    }
+
+    .related-grid a {
+      display: block;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+      color: var(--ink);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .related-grid a:hover { border-color: var(--dex-red); }
+
+    .related-grid img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: contain;
+      margin-bottom: 8px;
+    }
+
+    footer {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px 32px;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    footer a { color: inherit; }
+
+    @media (max-width: 760px) {
+      .pokemon {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="lid">
+    <div class="lid-inner">
+      <span class="lens" aria-hidden="true"></span>
+      <p class="wordmark"><a href="index.html">Pokédex search</a></p>
+    </div>
+  </header>
+
+  <main>
+    <a class="back" href="index.html" id="back">Back to search</a>
+
+    <div id="status" class="status" role="status" aria-live="polite">Loading Pokémon…</div>
+
+    <article id="pokemon" class="pokemon" hidden>
+      <div class="art">
+        <img id="art" src="" alt="" />
+      </div>
+      <div class="info">
+        <p id="number" class="number"></p>
+        <h1 id="name" class="name"></h1>
+        <ul id="types" class="types" aria-label="Types"></ul>
+        <p id="summary" class="summary"></p>
+
+        <h2 class="ask-heading">Ask about <span id="ask-name"></span></h2>
+        <p class="ask-hint">Opens the search page with a generated answer and its sources.</p>
+        <ul id="questions" class="questions"></ul>
+
+        <a id="source" class="source" href="#" target="_blank" rel="noopener">See the full entry on pokemondb.net</a>
+      </div>
+    </article>
+
+    <section id="related-section" class="related" hidden>
+      <h2 id="related-title"></h2>
+      <ul id="related" class="related-grid"></ul>
+    </section>
+  </main>
+
+  <footer>
+    Search powered by Coveo. Pokémon data and artwork from <a href="https://pokemondb.net">pokemondb.net</a>.
+  </footer>
+
+  <script type="module">
+    const cfg = window.POKEDEX_CONFIG;
+    const SEARCH_URL = `https://${cfg.organizationId}.org.coveo.com/rest/search/v2`;
+    const FIELDS = ["pokemon_name", "pokemon_number", "pokemon_types", "pokemon_generation", "pokemon_image"];
+    const ALLOWED_URL = /^https:\/\/pokemondb\.net\/pokedex\/[a-z0-9-]+$/;
+
+    // Widely used type colors from the games
+    const TYPE_COLORS = {
+      Normal: "#A8A77A", Fire: "#EE8130", Water: "#6390F0", Electric: "#F7D02C",
+      Grass: "#7AC74C", Ice: "#96D9D6", Fighting: "#C22E28", Poison: "#A33EA1",
+      Ground: "#E2BF65", Flying: "#A98FF3", Psychic: "#F95587", Bug: "#A6B91A",
+      Rock: "#B6A136", Ghost: "#735797", Dragon: "#6F35FC", Dark: "#705746",
+      Steel: "#B7B7CE", Fairy: "#D685AD",
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    // Every request goes through the Pokedex search hub, so it uses the Pokedex pipeline.
+    async function search(body) {
+      const res = await fetch(SEARCH_URL, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${cfg.accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ searchHub: cfg.searchHub, fieldsToInclude: FIELDS, ...body }),
+      });
+      if (!res.ok) throw new Error(`Search API returned ${res.status}`);
+      return res.json();
+    }
+
+    const first = (v) => (Array.isArray(v) ? v[0] : v);
+    const asList = (v) =>
+      Array.isArray(v) ? v : v ? String(v).split(";").map((s) => s.trim()).filter(Boolean) : [];
+    const escapeQuotes = (s) => String(s).replace(/"/g, '\\"');
+    // Newly revealed Pokémon have "???" as their number on pokemondb; the integer field stores that as 0
+    const formatNumber = (n) => (Number(n) > 0 ? `#${String(n).padStart(4, "0")}` : "#???");
+    const detailHref = (url) => `pokemon.html?url=${encodeURIComponent(url)}`;
+    const askHref = (question) => `index.html#q=${encodeURIComponent(question)}`;
+
+    // Dark text on light chips, white text on dark chips
+    function textColorFor(hex) {
+      const n = parseInt(hex.slice(1), 16);
+      const [r, g, b] = [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+      const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      return luminance > 0.6 ? "#1f2a37" : "#ffffff";
+    }
+
+    function showStatus(html) {
+      $("status").innerHTML = html;
+      $("status").hidden = false;
+    }
+
+    function render(result) {
+      const raw = result.raw || {};
+      const name = first(raw.pokemon_name) || result.title;
+      const types = asList(raw.pokemon_types);
+      const generation = first(raw.pokemon_generation);
+
+      document.title = `${name} | Pokédex search`;
+      $("art").src = first(raw.pokemon_image) || "";
+      $("art").alt = `Official artwork of ${name}`;
+      $("number").textContent = formatNumber(first(raw.pokemon_number));
+      $("name").textContent = name;
+      $("ask-name").textContent = name;
+
+      $("types").replaceChildren(
+        ...types.map((t) => {
+          const li = document.createElement("li");
+          const color = TYPE_COLORS[t] || "#5b6573";
+          li.className = "type";
+          li.textContent = t;
+          li.style.background = color;
+          li.style.color = textColorFor(color);
+          return li;
+        })
+      );
+
+      const typeText = types.length ? `${types.join("/")} type ` : "";
+      const genText = generation ? ` introduced in ${generation}` : "";
+      $("summary").textContent = `${name} is a ${typeText}Pokémon${genText}.`;
+
+      const questions = [
+        `What does ${name} evolve into?`,
+        `What is ${name} weak to?`,
+        `Where can I find ${name} in the games?`,
+      ];
+      $("questions").replaceChildren(
+        ...questions.map((q) => {
+          const li = document.createElement("li");
+          const a = document.createElement("a");
+          a.href = askHref(q);
+          a.textContent = q;
+          li.append(a);
+          return li;
+        })
+      );
+
+      $("source").href = result.clickUri;
+      $("status").hidden = true;
+      $("pokemon").hidden = false;
+      return { name, types };
+    }
+
+    async function loadRelated(type, currentUrl) {
+      if (!type) return;
+      const data = await search({
+        q: "",
+        aq: `@pokemon_types=="${escapeQuotes(type)}"`,
+        sortCriteria: "@pokemon_number ascending",
+        numberOfResults: 9,
+      });
+      const others = (data.results || []).filter((r) => r.clickUri !== currentUrl).slice(0, 8);
+      if (!others.length) return;
+
+      $("related-title").textContent = `More ${type} Pokémon`;
+      $("related").replaceChildren(
+        ...others.map((r) => {
+          const raw = r.raw || {};
+          const li = document.createElement("li");
+          const a = document.createElement("a");
+          a.href = detailHref(r.clickUri);
+          const img = document.createElement("img");
+          img.src = first(raw.pokemon_image) || "";
+          img.alt = "";
+          img.loading = "lazy";
+          a.append(img, document.createTextNode(first(raw.pokemon_name) || r.title));
+          li.append(a);
+          return li;
+        })
+      );
+      $("related-section").hidden = false;
+    }
+
+    async function load() {
+      // If the visitor came from our search page, "Back to search" restores their exact search
+      // (query, filters, answer), which lives in the search page's URL hash.
+      if (document.referrer) {
+        const ref = new URL(document.referrer);
+        const cameFromSearch = ref.origin === location.origin && !ref.pathname.endsWith("pokemon.html");
+        if (cameFromSearch) {
+          $("back").addEventListener("click", (event) => {
+            event.preventDefault();
+            history.back();
+          });
+        }
+      }
+
+      const url = new URLSearchParams(location.search).get("url");
+      if (!url || !ALLOWED_URL.test(url)) {
+        showStatus('Pick a Pokémon from the <a href="index.html">search page</a> to see its details.');
+        return;
+      }
+
+      try {
+        const data = await search({ q: "", aq: `@uri=="${escapeQuotes(url)}"`, numberOfResults: 1 });
+        const result = data.results && data.results[0];
+        if (!result) {
+          showStatus('That Pokémon isn\u2019t in the index. Try the <a href="index.html">search page</a>.');
+          return;
+        }
+        const { types } = render(result);
+        loadRelated(types[0], url).catch((err) => console.error(err));
+      } catch (err) {
+        console.error(err);
+        showStatus('Search is unavailable right now. Try again in a moment, or go back to the <a href="index.html">search page</a>.');
+      }
+    }
+
+    load();
+  </script>
+</body>
+</html>

@@ -10,6 +10,16 @@
   <script type="module" src="https://static.cloud.coveo.com/atomic/v3.57.3/atomic.esm.js"></script>
   <link rel="stylesheet" href="https://static.cloud.coveo.com/atomic/v3.57.3/themes/coveo.css" />
 
+  <!-- Org ID, public key and search hub, shared with pokemon.html -->
+  <script src="config.js"></script>
+
+  <script>
+    // Atomic's link security filter only accepts absolute addresses (https://...) or ones
+    // starting with "/". A relative "pokemon.html" gets blanked, so we build the full address
+    // here. It resolves correctly on localhost and under the GitHub Pages sub-folder.
+    window.DETAIL_PAGE_URL = new URL("pokemon.html", window.location.href).href;
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -128,7 +138,15 @@
         <atomic-layout-section section="facets">
           <atomic-facet-manager>
             <atomic-facet field="pokemon_types" label="Type" number-of-values="18" sort-criteria="alphanumeric"></atomic-facet>
-            <atomic-facet field="pokemon_generation" label="Generation" number-of-values="10" sort-criteria="alphanumeric"></atomic-facet>
+            <!-- custom-sort keeps "Generation 10" after "Generation 9" instead of after "Generation 1" -->
+            <atomic-facet
+              field="pokemon_generation"
+              label="Generation"
+              number-of-values="10"
+              with-search="false"
+              sort-criteria="alphanumeric"
+              custom-sort='["Generation 1","Generation 2","Generation 3","Generation 4","Generation 5","Generation 6","Generation 7","Generation 8","Generation 9","Generation 10"]'>
+            </atomic-facet>
           </atomic-facet-manager>
         </atomic-layout-section>
 
@@ -166,8 +184,8 @@
                   </atomic-result-section-visual>
 
                   <atomic-result-section-title>
-                    <!-- Show the clean name instead of the long page title -->
-                    <atomic-result-link>
+                    <!-- Show the clean name instead of the long page title, and open our own detail page -->
+                    <atomic-result-link href-template="${DETAIL_PAGE_URL}?url=${clickUri}">
                       <atomic-result-text field="pokemon_name"></atomic-result-text>
                     </atomic-result-link>
                   </atomic-result-section-title>
@@ -178,6 +196,11 @@
                       <atomic-result-text field="pokemon_generation"></atomic-result-text>
                     </div>
                   </atomic-result-section-bottom-metadata>
+                </template>
+
+                <!-- In grid layout, clicking anywhere on a card follows this link -->
+                <template slot="link">
+                  <atomic-result-link href-template="${DETAIL_PAGE_URL}?url=${clickUri}"></atomic-result-link>
                 </template>
               </atomic-result-template>
             </atomic-result-list>
@@ -200,20 +223,13 @@
   </footer>
 
   <script type="module">
-    // Your Coveo organization
-    const COVEO_ORG_ID = "69ydoe1s4lcvoorg";
-
-    // API key created from the "Anonymous search" template, locked to the "Pokedex" search hub.
-    // Safe to expose in browser code: it can only run queries and send usage analytics.
-    const COVEO_API_KEY = "xxd67fea27-1baa-4ff2-8ca1-6da22acea028";
+    // Org ID and public key come from config.js (shared with pokemon.html).
+    const { organizationId, accessToken } = window.POKEDEX_CONFIG;
 
     (async () => {
       await customElements.whenDefined("atomic-search-interface");
       const searchInterface = document.querySelector("atomic-search-interface");
-      await searchInterface.initialize({
-        organizationId: COVEO_ORG_ID,
-        accessToken: COVEO_API_KEY,
-      });
+      await searchInterface.initialize({ organizationId, accessToken });
       searchInterface.executeFirstSearch();
     })();
   </script>
