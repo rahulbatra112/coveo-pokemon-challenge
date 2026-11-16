@@ -57,6 +57,11 @@
 - Decision: Keep content as is for the demo. Next iteration: exclude move, TM, location and sprite tables plus navigation at indexing, then rebuild the models.
 - Why: Answers and passages can only be as good as the chunks behind them. Changing content right before the panel risks the index and models being out of sync.
 
+## D14: Turn on Automatic Relevance Tuning before there is traffic
+- Decision: Created "Pokedex ART" and associated it with the Pokedex pipeline (November 16, 2026).
+- Why: it learns which results people click, so switching it on now means it learns from the first real visitors, with no change to the page.
+- Evidence: build in progress with 0 search events, 0 clicks and 0 learned queries. Coveo's documentation says an org needs enough data first, so I don't claim it changes rankings yet.
+
 ## D13 – Stop words for question words
 - Evidence: Question-style queries matched hundreds of pages through words like "what," "does" and "into."
 - Decision: Stop word rule on the Pokedex pipeline (what, which, who, how, does, do, did, is, are, was, the, a, an, into, of, as, in, to, for).
